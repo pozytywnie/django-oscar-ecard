@@ -3,24 +3,31 @@ import datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
+from django.db.utils import DatabaseError
 
 
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'eCardPaymentRequest'
-        db.create_table('oscar_ecard_ecardpaymentrequest', (
-            ('source_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['payment.Source'], unique=True, primary_key=True)),
-        ))
-        db.send_create_signal('oscar_ecard', ['eCardPaymentRequest'])
+        try:
+            db.rename_table('ecard_payment_ecardpaymentrequest', 'oscar_ecard_ecardpaymentrequest')
+            db.send_create_signal('oscar_ecard', ['eCardPaymentRequest'])
+            db.rename_table('ecard_payment_ecardpaymentresponse', 'oscar_ecard_ecardpaymentresponse')
+            db.send_create_signal('oscar_ecard', ['eCardPaymentResponse'])
+        except DatabaseError:
+            # Adding model 'eCardPaymentRequest'
+            db.create_table('oscar_ecard_ecardpaymentrequest', (
+                ('source_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['payment.Source'], unique=True, primary_key=True)),
+            ))
+            db.send_create_signal('oscar_ecard', ['eCardPaymentRequest'])
 
-        # Adding model 'eCardPaymentResponse'
-        db.create_table('oscar_ecard_ecardpaymentresponse', (
-            ('transaction_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['payment.Transaction'], unique=True, primary_key=True)),
-            ('body', self.gf('django.db.models.fields.TextField')()),
-            ('ip', self.gf('django.db.models.fields.CharField')(max_length=20)),
-        ))
-        db.send_create_signal('oscar_ecard', ['eCardPaymentResponse'])
+            # Adding model 'eCardPaymentResponse'
+            db.create_table('oscar_ecard_ecardpaymentresponse', (
+                ('transaction_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['payment.Transaction'], unique=True, primary_key=True)),
+                ('body', self.gf('django.db.models.fields.TextField')()),
+                ('ip', self.gf('django.db.models.fields.CharField')(max_length=20)),
+            ))
+            db.send_create_signal('oscar_ecard', ['eCardPaymentResponse'])
 
 
     def backwards(self, orm):
