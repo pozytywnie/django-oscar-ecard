@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='oscar-ecard',
-    version='0.1',
+    version='0.2',
     description="eCard payment system",
     maintainer="Tomasz Wysocki",
     maintainer_email="tomasz@wysocki.info",
